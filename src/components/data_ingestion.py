@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
 from src.components.data_transformation import DataTransformation, DataTransformationConfig
+from src.components.model_trainer import ModelTrainer, ModelTrainerConfig
 
 @dataclass
 class DataIngestionConfig:
@@ -47,4 +48,9 @@ if __name__=="__main__":
     train_data, test_data= obj.initiate_data_ingestion()
 
     data_transformation = DataTransformation()
-    data_transformation.init_data_transformation(train_data, test_data)
+    train_arr, test_arr, _ = data_transformation.init_data_transformation(train_data, test_data)
+
+    model_trainer = ModelTrainer()
+    print(
+        f"Accuracy for the best model is:{model_trainer.init_model_trainer(train_arr, test_arr)*100:.2f}"
+        )
