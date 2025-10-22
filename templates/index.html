@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body[dir="rtl"] {
+            font-family: 'Cairo', 'Segoe UI', sans-serif;
+        }
+
+        .lang-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        body[dir="rtl"] .lang-toggle {
+            right: auto;
+            left: 20px;
+        }
+
+        .lang-btn {
+            background: rgba(79, 209, 197, 0.1);
+            border: 2px solid #4fd1c5;
+            color: #4fd1c5;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .lang-btn:hover {
+            background: rgba(79, 209, 197, 0.2);
+            box-shadow: 0 0 20px rgba(79, 209, 197, 0.3);
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1420 100%);
+            padding: 25px 0;
+            border-bottom: 2px solid #4fd1c5;
+            box-shadow: 0 4px 20px rgba(79, 209, 197, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header h1 {
+            color: #4fd1c5;
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: 700;
+            text-shadow: 0 0 30px rgba(79, 209, 197, 0.5);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 50%, rgba(79, 209, 197, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero {
+            text-align: center;
+            max-width: 900px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h2 {
+            font-size: 3.5em;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #4fd1c5 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero p {
+            font-size: 1.2em;
+            line-height: 1.8;
+            margin-bottom: 50px;
+            color: #b0b0b0;
+            animation: fadeInUp 1s ease;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background: linear-gradient(135deg, #4fd1c5 0%, #6366f1 100%);
+            color: #0a0e27;
+            padding: 18px 50px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(79, 209, 197, 0.3);
+            animation: fadeInUp 1.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(79, 209, 197, 0.5);
+        }
+
+        footer {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1420 100%);
+            color: #b0b0b0;
+            text-align: center;
+            padding: 25px 0;
+            border-top: 2px solid #4fd1c5;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin: 50px 0;
+            animation: fadeInUp 1.4s ease;
+        }
+
+        .feature-card {
+            background: rgba(26, 31, 58, 0.5);
+            border: 1px solid rgba(79, 209, 197, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: #4fd1c5;
+            box-shadow: 0 10px 40px rgba(79, 209, 197, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            color: #4fd1c5;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .feature-card p {
+            color: #b0b0b0;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .hero h2 {
+                font-size: 2.2em;
+            }
+
+            .hero p {
+                font-size: 1em;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="lang-toggle">
+        <button class="lang-btn" onclick="toggleLanguage()">
+            <span class="en-text">العربية</span>
+            <span class="ar-text" style="display:none;">English</span>
+        </button>
+    </div>
+
+    <header>
+        <div class="container">
+            <h1>
+                <span class="en-text">AI Performance Predictor</span>
+                <span class="ar-text" style="display:none;">متنبئ الأداء بالذكاء الاصطناعي</span>
+            </h1>
+        </div>
+    </header>
+
+    <main>
+        <div class="bg-pattern"></div>
+        <section class="hero">
+            <div class="container">
+                <h2>
+                    <span class="en-text">Unlock Your Academic Potential</span>
+                    <span class="ar-text" style="display:none;">اكتشف إمكاناتك الأكاديمية</span>
+                </h2>
+
+                <p class="en-text">
+                    Harness the power of artificial intelligence to predict your mathematics performance.
+                    Our cutting-edge machine learning algorithms analyze your academic profile and provide
+                    personalized insights to help you achieve excellence.
+                </p>
+                <p class="ar-text" style="display:none;">
+                    استفد من قوة الذكاء الاصطناعي للتنبؤ بأدائك في الرياضيات. تقوم خوارزميات التعلم
+                    الآلي المتطورة لدينا بتحليل ملفك الأكاديمي وتوفير رؤى شخصية لمساعدتك على تحقيق التميز.
+                </p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3>
+                            <span class="en-text">AI-Powered</span>
+                            <span class="ar-text" style="display:none;">مدعوم بالذكاء الاصطناعي</span>
+                        </h3>
+                        <p class="en-text">Advanced machine learning algorithms for accurate predictions</p>
+                        <p class="ar-text" style="display:none;">خوارزميات تعلم آلي متقدمة للتنبؤات الدقيقة</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>
+                            <span class="en-text">Data-Driven</span>
+                            <span class="ar-text" style="display:none;">قائم على البيانات</span>
+                        </h3>
+                        <p class="en-text">Insights based on comprehensive academic data analysis</p>
+                        <p class="ar-text" style="display:none;">رؤى مبنية على تحليل شامل للبيانات الأكاديمية</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>
+                            <span class="en-text">Instant Results</span>
+                            <span class="ar-text" style="display:none;">نتائج فورية</span>
+                        </h3>
+                        <p class="en-text">Get your performance prediction in seconds</p>
+                        <p class="ar-text" style="display:none;">احصل على تنبؤ أدائك في ثوانٍ</p>
+                    </div>
+                </div>
+
+                <a href="/PredictData" class="btn-primary">
+                    <span class="en-text">Start Prediction</span>
+                    <span class="ar-text" style="display:none;">ابدأ التنبؤ</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>
+                <span class="en-text">&copy; 2024 AI Performance Predictor. All rights reserved.</span>
+                <span class="ar-text" style="display:none;">&copy; 2024 - متنبئ الأداء بالذكاء الاصطناعي. جميع الحقوق
+                    محفوظة.</span>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleLanguage() {
+            const html = document.documentElement;
+            const enTexts = document.querySelectorAll('.en-text');
+            const arTexts = document.querySelectorAll('.ar-text');
+
+            if (html.getAttribute('lang') === 'en') {
+                html.setAttribute('lang', 'ar');
+                html.setAttribute('dir', 'rtl');
+                enTexts.forEach(el => el.style.display = 'none');
+                arTexts.forEach(el => el.style.display = 'inline');
+            } else {
+                html.setAttribute('lang', 'en');
+                html.setAttribute('dir', 'ltr');
+                enTexts.forEach(el => el.style.display = 'inline');
+                arTexts.forEach(el => el.style.display = 'none');
+            }
+        }
+    </script>
+</body>
+
+</html>

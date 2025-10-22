@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict Your Score - AI Performance Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body[dir="rtl"] {
+            font-family: 'Cairo', 'Segoe UI', sans-serif;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(79, 209, 197, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .lang-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        body[dir="rtl"] .lang-toggle {
+            right: auto;
+            left: 20px;
+        }
+
+        .lang-btn {
+            background: rgba(79, 209, 197, 0.1);
+            border: 2px solid #4fd1c5;
+            color: #4fd1c5;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .lang-btn:hover {
+            background: rgba(79, 209, 197, 0.2);
+            box-shadow: 0 0 20px rgba(79, 209, 197, 0.3);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 80px auto 40px;
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.9) 0%, rgba(15, 20, 32, 0.9) 100%);
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(79, 209, 197, 0.2);
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(20px);
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            background: linear-gradient(135deg, #4fd1c5 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            font-size: 2.5em;
+            text-shadow: 0 0 30px rgba(79, 209, 197, 0.3);
+        }
+
+        .subtitle {
+            color: #b0b0b0;
+            font-size: 1.1em;
+        }
+
+        fieldset {
+            border: 1px solid rgba(79, 209, 197, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            background: rgba(26, 31, 58, 0.3);
+        }
+
+        legend {
+            color: #4fd1c5;
+            font-size: 1.3em;
+            font-weight: 700;
+            padding: 0 15px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #e0e0e0;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid rgba(79, 209, 197, 0.3);
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: rgba(15, 20, 32, 0.8);
+            color: #e0e0e0;
+        }
+
+        select:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4fd1c5;
+            box-shadow: 0 0 20px rgba(79, 209, 197, 0.3);
+            background: rgba(15, 20, 32, 1);
+        }
+
+        select option {
+            background: #1a1f3a;
+            color: #e0e0e0;
+        }
+
+        select option[disabled] {
+            color: #666;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #4fd1c5 0%, #6366f1 100%);
+            color: #0a0e27;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-submit:hover::before {
+            left: 100%;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(79, 209, 197, 0.5);
+        }
+
+        .btn-submit:active {
+            transform: translateY(-1px);
+        }
+
+        .result-box {
+            margin-top: 40px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(79, 209, 197, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #4fd1c5;
+            display: none;
+            animation: slideIn 0.6s ease, glow 2s ease-in-out infinite alternate;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 20px rgba(79, 209, 197, 0.3);
+            }
+
+            to {
+                box-shadow: 0 0 40px rgba(79, 209, 197, 0.6);
+            }
+        }
+
+        .result-label {
+            color: #4fd1c5;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .result-box h2 {
+            background: linear-gradient(135deg, #4fd1c5 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 3em;
+            font-weight: 700;
+        }
+
+        .input-glow:focus {
+            animation: inputGlow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes inputGlow {
+            from {
+                box-shadow: 0 0 10px rgba(79, 209, 197, 0.3);
+            }
+
+            to {
+                box-shadow: 0 0 20px rgba(79, 209, 197, 0.5);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin-top: 70px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            fieldset {
+                padding: 20px 15px;
+            }
+
+            .result-box h2 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-pattern"></div>
+
+    <div class="lang-toggle">
+        <button class="lang-btn" onclick="toggleLanguage()">
+            <span class="en-text">العربية</span>
+            <span class="ar-text" style="display:none;">English</span>
+        </button>
+    </div>
+
+    <div class="container">
+        <div class="header-section">
+            <h1>
+                <span class="en-text">AI Performance Predictor</span>
+                <span class="ar-text" style="display:none;">متنبئ الأداء بالذكاء الاصطناعي</span>
+            </h1>
+            <p class="subtitle">
+                <span class="en-text">Enter student data for AI-powered math score prediction</span>
+                <span class="ar-text" style="display:none;">أدخل بيانات الطالب للتنبؤ بدرجة الرياضيات بالذكاء
+                    الاصطناعي</span>
+            </p>
+        </div>
+
+        <form action="/PredictData" method="post">
+            <fieldset>
+                <legend>
+                    <span class="en-text">🎯 Personal Information</span>
+                    <span class="ar-text" style="display:none;">🎯 المعلومات الشخصية</span>
+                </legend>
+
+                <div class="form-group">
+                    <label>
+                        <span class="en-text">Gender</span>
+                        <span class="ar-text" style="display:none;">الجنس</span>
+                    </label>
+                    <select name="gender" class="input-glow" required>
+                        <option disabled selected value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <span class="en-text">Race or Ethnicity</span>
+                        <span class="ar-text" style="display:none;">العرق أو الإثنية</span>
+                    </label>
+                    <select name="ethnicity" class="input-glow" required>
+                        <option disabled selected value="">Select Ethnicity</option>
+                        <option value="group A">Group A</option>
+                        <option value="group B">Group B</option>
+                        <option value="group C">Group C</option>
+                        <option value="group D">Group D</option>
+                        <option value="group E">Group E</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>
+                    <span class="en-text">📚 Educational Background</span>
+                    <span class="ar-text" style="display:none;">📚 الخلفية التعليمية</span>
+                </legend>
+
+                <div class="form-group">
+                    <label>
+                        <span class="en-text">Parental Level of Education</span>
+                        <span class="ar-text" style="display:none;">المستوى التعليمي للوالدين</span>
+                    </label>
+                    <select name="parental_level_of_education" class="input-glow" required>
+                        <option disabled selected value="">Select Education Level</option>
+                        <option value="some high school">Some High School</option>
+                        <option value="high school">High School</option>
+                        <option value="some college">Some College</option>
+                        <option value="associate's degree">Associate's Degree</option>
+                        <option value="bachelor's degree">Bachelor's Degree</option>
+                        <option value="master's degree">Master's Degree</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <span class="en-text">Lunch Type</span>
+                        <span class="ar-text" style="display:none;">نوع الوجبة</span>
+                    </label>
+                    <select name="lunch" class="input-glow" required>
+                        <option disabled selected value="">Select Lunch Type</option>
+                        <option value="free/reduced">Free/Reduced</option>
+                        <option value="standard">Standard</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <span class="en-text">Test Preparation Course</span>
+                        <span class="ar-text" style="display:none;">دورة الإعداد للاختبار</span>
+                    </label>
+                    <select name="test_preparation_course" class="input-glow" required>
+                        <option disabled selected value="">Select Course Status</option>
+                        <option value="none">None</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>
+                    <span class="en-text">📊 Performance Scores</span>
+                    <span class="ar-text" style="display:none;">📊 درجات الأداء</span>
+                </legend>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>
+                            <span class="en-text">Reading Score (0-100)</span>
+                            <span class="ar-text" style="display:none;">درجة القراءة (0-100)</span>
+                        </label>
+                        <input type="number" name="reading_score" class="input-glow" min="0" max="100" required
+                            placeholder="0-100">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <span class="en-text">Writing Score (0-100)</span>
+                            <span class="ar-text" style="display:none;">درجة الكتابة (0-100)</span>
+                        </label>
+                        <input type="number" name="writing_score" class="input-glow" min="0" max="100" required
+                            placeholder="0-100">
+                    </div>
+                </div>
+            </fieldset>
+
+            <button type="submit" class="btn-submit">
+                <span class="en-text">🚀 Generate AI Prediction</span>
+                <span class="ar-text" style="display:none;">🚀 إنشاء تنبؤ الذكاء الاصطناعي</span>
+            </button>
+        </form>
+
+        {% if results %}
+        <div class="result-box show">
+            <p class="result-label">
+                <span class="en-text">Predicted Math Score</span>
+                <span class="ar-text" style="display:none;">درجة الرياضيات المتوقعة</span>
+            </p>
+            <h2>{{ "%.2f" | format(results) }}%</h2>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleLanguage() {
+            const html = document.documentElement;
+            const enTexts = document.querySelectorAll('.en-text');
+            const arTexts = document.querySelectorAll('.ar-text');
+
+            if (html.getAttribute('lang') === 'en') {
+                html.setAttribute('lang', 'ar');
+                html.setAttribute('dir', 'rtl');
+                enTexts.forEach(el => el.style.display = 'none');
+                arTexts.forEach(el => el.style.display = 'inline');
+            } else {
+                html.setAttribute('lang', 'en');
+                html.setAttribute('dir', 'ltr');
+                enTexts.forEach(el => el.style.display = 'inline');
+                arTexts.forEach(el => el.style.display = 'none');
+            }
+        }
+    </script>
+</body>
+
+</html>
